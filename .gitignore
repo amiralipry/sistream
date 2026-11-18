@@ -1,0 +1,25 @@
+node_modules/
+.env
+.env.local
+*.log
+npm-debug.log*
+
+# Live runtime folders (auto-created by server.js)
+recordings/*
+!recordings/.gitkeep
+uploads/*
+!uploads/.gitkeep
+public/preview/*
+!public/preview/.gitkeep
+
+# Temporary / test artifacts
+null
+ov.png
+ov_test.png
+test_img.png
+test_pipe.png
+public/trans_fallback.png
+
+# OS files
+.DS_Store
+Thumbs.db

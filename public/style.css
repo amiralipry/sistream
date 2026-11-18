@@ -1,0 +1,605 @@
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light;
+
+  /* Primary Brand: Deep Petrol / Navy #153047 */
+  --brand-primary: #153047;
+  --brand-dark: #0d1e2e;
+  --brand-surface: #1c3f5d;
+  --brand-light: #25527a;
+  --brand-tint: #eaf1f7;
+  --brand-border: #cbdceb;
+  --brand-glow: rgba(21, 48, 71, 0.15);
+}
+
+.font-mono-code {
+  font-family: 'JetBrains Mono', Consolas, Monaco, monospace;
+}
+
+/* =================== Bento Card & Glassmorphism (#153047 Theme) =================== */
+.bento-card {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(203, 220, 235, 0.8);
+  border-radius: 1.5rem;
+  box-shadow: 
+    0 16px 36px -12px rgba(21, 48, 71, 0.08),
+    0 2px 6px rgba(21, 48, 71, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bento-card:hover {
+  border-color: rgba(37, 82, 122, 0.4);
+  box-shadow: 
+    0 20px 42px -12px rgba(21, 48, 71, 0.12),
+    0 4px 12px rgba(21, 48, 71, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.bento-card-dark {
+  background: linear-gradient(145deg, #153047 0%, #0d1e2e 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.5rem;
+  box-shadow: 
+    0 20px 40px -10px rgba(13, 30, 46, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+/* =================== Custom Apple-Style Toggle Switch =================== */
+.apple-toggle {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.apple-toggle-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.apple-toggle-track {
+  width: 44px;
+  height: 24px;
+  background-color: #cbd5e1;
+  border-radius: 9999px;
+  position: relative;
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.apple-toggle-thumb {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 20px;
+  height: 20px;
+  background-color: #ffffff;
+  border-radius: 9999px;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2), 0 0 1px rgba(0, 0, 0, 0.3);
+}
+
+/* In RTL: when checked, shift thumb to the left */
+.apple-toggle-input:checked + .apple-toggle-track {
+  background-color: #153047;
+}
+
+.apple-toggle-input:checked + .apple-toggle-track .apple-toggle-thumb {
+  transform: translateX(-20px);
+}
+
+/* Color variations for toggle switches */
+.apple-toggle-emerald .apple-toggle-input:checked + .apple-toggle-track {
+  background-color: #10b981;
+}
+
+.apple-toggle-amber .apple-toggle-input:checked + .apple-toggle-track {
+  background-color: #f59e0b;
+}
+
+.apple-toggle-rose .apple-toggle-input:checked + .apple-toggle-track {
+  background-color: #f43f5e;
+}
+
+/* =================== Realistic Smartphone Mockup =================== */
+.phone-device {
+  width: 100%;
+  max-width: 330px;
+  margin: 0 auto;
+  background: #111827;
+  border-radius: 46px;
+  padding: 10px;
+  box-shadow: 
+    0 25px 60px -15px rgba(21, 48, 71, 0.35),
+    0 10px 25px -5px rgba(0, 0, 0, 0.15),
+    inset 0 0 0 2px #374151,
+    inset 0 0 0 4px #1f2937;
+  position: relative;
+  border: 4px solid #0f172a;
+  transition: transform 0.3s ease;
+}
+
+/* Titanium side buttons simulation */
+.phone-device::before {
+  content: '';
+  position: absolute;
+  top: 90px;
+  right: -7px;
+  width: 3px;
+  height: 48px;
+  background: #475569;
+  border-radius: 3px 0 0 3px;
+}
+
+.phone-device::after {
+  content: '';
+  position: absolute;
+  top: 155px;
+  right: -7px;
+  width: 3px;
+  height: 48px;
+  background: #475569;
+  border-radius: 3px 0 0 3px;
+}
+
+/* Inner Phone Screen */
+.phone-screen {
+  background: #020617;
+  border-radius: 38px;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  display: flex;
+  flex-direction: column;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+/* Dynamic Island */
+.phone-island {
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 24px;
+  background: #000000;
+  border-radius: 20px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.phone-camera-lens {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #1e293b 40%, #0f172a 80%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.phone-sensor-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #090d16;
+}
+
+/* Phone Status Bar (iOS style) */
+.phone-status-bar {
+  height: 38px;
+  padding: 8px 18px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  z-index: 30;
+  position: relative;
+  user-select: none;
+}
+
+.phone-clock {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: -0.2px;
+}
+
+.phone-icons {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Phone Screen Viewport Area */
+.phone-viewport {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000000;
+}
+
+.phone-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #000000;
+}
+
+/* Phone Home Indicator Bar */
+.phone-home-indicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 9999px;
+  z-index: 40;
+  pointer-events: none;
+}
+
+/* =================== Stunning Phone Offline State Screen =================== */
+.phone-offline-layer {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, #153047 0%, #08111a 75%, #020617 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  text-align: center;
+  color: #ffffff;
+  z-index: 25;
+  transition: opacity 0.3s ease;
+}
+
+/* Radar pulse animation for offline signal state */
+.offline-radar-box {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.offline-radar-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(244, 63, 94, 0.4);
+  animation: radar-wave 2.4s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+
+.offline-radar-ring:nth-child(2) {
+  animation-delay: 0.8s;
+}
+
+.offline-radar-core {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(244, 63, 94, 0.15);
+  border: 1px solid rgba(244, 63, 94, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fb7185;
+}
+
+@keyframes radar-wave {
+  0% {
+    transform: scale(0.6);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+/* Modern Inputs with #153047 Accent */
+.bento-input {
+  background: #ffffff;
+  border: 1px solid #cbdceb;
+  border-radius: 0.85rem;
+  box-shadow: 
+    inset 0 1px 3px rgba(21, 48, 71, 0.04),
+    0 1px 2px rgba(21, 48, 71, 0.02);
+  color: #0f172a;
+  transition: all 0.2s ease;
+}
+
+.bento-input:focus {
+  border-color: #153047;
+  box-shadow: 
+    inset 0 1px 3px rgba(21, 48, 71, 0.04),
+    0 0 0 3px rgba(21, 48, 71, 0.15);
+  outline: none;
+}
+
+/* Tactile 3D Buttons with #153047 Theme */
+.btn-brand-primary {
+  background: linear-gradient(135deg, #1e4566 0%, #153047 100%);
+  color: #ffffff;
+  box-shadow: 
+    0 8px 18px -4px rgba(21, 48, 71, 0.35),
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.2);
+  transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+  user-select: none;
+}
+
+.btn-brand-primary:hover {
+  background: linear-gradient(135deg, #25527a 0%, #153047 100%);
+  box-shadow: 
+    0 12px 22px -4px rgba(21, 48, 71, 0.45),
+    inset 0 1px 2px rgba(255, 255, 255, 0.35);
+}
+
+.btn-brand-primary:active {
+  transform: scale(0.97);
+}
+
+.btn-brand-emerald {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  box-shadow: 
+    0 8px 18px -4px rgba(16, 185, 129, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.15);
+  transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.btn-brand-emerald:hover {
+  background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+  box-shadow: 0 12px 22px -4px rgba(16, 185, 129, 0.5);
+}
+.btn-brand-emerald:active {
+  transform: scale(0.97);
+}
+
+.btn-brand-rose {
+  background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+  color: #ffffff;
+  box-shadow: 
+    0 8px 18px -4px rgba(244, 63, 94, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.15);
+  transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.btn-brand-rose:hover {
+  background: linear-gradient(135deg, #fb7185 0%, #e11d48 100%);
+  box-shadow: 0 12px 22px -4px rgba(244, 63, 94, 0.5);
+}
+.btn-brand-rose:active {
+  transform: scale(0.97);
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(203, 220, 235, 0.3);
+}
+::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #153047;
+}
+
+.terminal-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.terminal-scroll::-webkit-scrollbar-track {
+  background: #020617;
+}
+.terminal-scroll::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 9999px;
+}
+.terminal-scroll::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Scene Buttons */
+.scene-btn {
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.scene-btn:hover {
+  border-color: #153047;
+  transform: translateY(-1px);
+}
+.scene-btn:active {
+  transform: scale(0.98);
+}
+
+/* =================== PWA & Super-Responsive Engine =================== */
+html, body {
+  overflow-x: clip;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  scroll-behavior: smooth;
+}
+
+/* Safe area handling for notched phones & standalone PWA */
+.pwa-safe-header {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.pwa-safe-main {
+  padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
+  padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+}
+
+/* Touch-friendly Range Sliders (#153047) */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: #e2e8f0;
+  border-radius: 9999px;
+  height: 6px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #153047;
+  border: 2.5px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(21, 48, 71, 0.35);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:active {
+  transform: scale(1.18);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #153047;
+  border: 2.5px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(21, 48, 71, 0.35);
+  cursor: pointer;
+}
+
+/* Floating Glassmorphic Mobile Bottom Navigation */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 45;
+  padding: 0.45rem 0.65rem calc(0.55rem + env(safe-area-inset-bottom, 0px));
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border-top: 1px solid rgba(203, 220, 235, 0.9);
+  box-shadow: 0 -10px 30px -10px rgba(21, 48, 71, 0.14);
+}
+
+.mobile-nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 0.42rem 0.25rem;
+  border-radius: 0.95rem;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 700;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  min-height: 46px;
+  user-select: none;
+}
+
+.mobile-nav-btn.is-active {
+  background: linear-gradient(135deg, #1e4566 0%, #153047 100%);
+  color: #ffffff;
+  box-shadow: 0 6px 14px -4px rgba(21, 48, 71, 0.45);
+}
+
+.mobile-nav-btn:active {
+  transform: scale(0.95);
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 767px) {
+  body {
+    padding-bottom: calc(5.8rem + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .bento-card {
+    border-radius: 1.25rem;
+  }
+
+  /* Prevent iOS Safari zoom on input focus while staying sleek */
+  .bento-input {
+    font-size: 14px;
+    min-height: 40px;
+  }
+
+  /* Touch-comfortable slider thumb on mobile */
+  input[type="range"]::-webkit-slider-thumb {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* Mobile tab filtering */
+  .mobile-section-hidden {
+    display: none !important;
+  }
+
+  .phone-device {
+    max-width: 295px;
+    border-radius: 42px;
+    padding: 8px;
+  }
+
+  .phone-screen {
+    border-radius: 34px;
+  }
+}
+
+@media (max-width: 400px) {
+  .phone-device {
+    max-width: 255px;
+    border-radius: 36px;
+    padding: 7px;
+  }
+
+  .phone-screen {
+    border-radius: 29px;
+  }
+
+  .phone-island {
+    width: 82px;
+    height: 20px;
+    top: 7px;
+  }
+
+  .mobile-nav-btn {
+    font-size: 9.5px;
+  }
+}
+
+/* Tablet & Desktop Sticky Phone Monitor */
+@media (min-width: 1024px) {
+  .desktop-sticky-monitor {
+    position: sticky;
+    top: 5.25rem;
+  }
+}
+
+

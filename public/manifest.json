@@ -1,0 +1,42 @@
+{
+  "id": "/",
+  "name": "استودیو رله و ترنسکد لایو",
+  "short_name": "استودیو لایو",
+  "description": "پخش زنده پایدار همزمان روبیکا، اینستاگرام و یوتیوب با پیش‌نمایش کم‌تأخیر و مدیریت لایه‌ها",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#f8fafc",
+  "theme_color": "#153047",
+  "dir": "rtl",
+  "lang": "fa",
+  "categories": ["multimedia", "utilities", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

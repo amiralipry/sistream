@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>استودیو رله و ترنسکد لایو</title>
+
+  <!-- PWA Metadata & iOS Native Experience -->
+  <meta name="theme-color" content="#153047">
+  <meta name="description" content="استودیو پخش زنده پایدار همزمان روبیکا، اینستاگرام و یوتیوب">
+  <meta name="application-name" content="استودیو لایو">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="استودیو لایو">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              DEFAULT: '#153047',
+              50: '#f0f5fa',
+              100: '#e0ecf5',
+              200: '#c5dcad',
+              300: '#9bc2db',
+              400: '#69a0c3',
+              500: '#4380aa',
+              600: '#2f668f',
+              700: '#25527a',
+              800: '#1c3f5d',
+              900: '#153047',
+              950: '#0d1e2e'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- HLS.js for In-Browser Video Preview -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen selection:bg-brand selection:text-white pb-16 antialiased">
+
+  <!-- Ambient background glow orbs for luxury Bento studio feel (#153047) -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+    <div class="absolute -top-40 right-1/4 w-[550px] h-[550px] bg-brand-900/10 rounded-full blur-[140px]"></div>
+    <div class="absolute top-1/3 -left-32 w-[450px] h-[450px] bg-brand-700/10 rounded-full blur-[130px]"></div>
+    <div class="absolute -bottom-32 right-1/3 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[130px]"></div>
+  </div>
+
+  <!-- Studio Header -->
+  <header class="sticky top-0 z-40 pwa-safe-header bg-white/90 backdrop-blur-md border-b border-brand-border/70 shadow-sm">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-2.5 sm:gap-4">
+      <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-brand-900 to-brand-700 flex items-center justify-center text-white shadow-md shadow-brand/20 shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <div class="min-w-0">
+          <h1 class="text-sm sm:text-base md:text-lg font-extrabold text-brand-950 flex items-center gap-1.5 sm:gap-2 truncate">
+            <span class="truncate">استودیو رله و ترنسکد لایو</span>
+            <span class="hidden xs:inline-block sm:inline-block text-[10px] sm:text-[11px] bg-brand-50 text-brand-900 border border-brand-200 px-2 py-0.5 rounded-full font-bold shrink-0">نسخه حرفه‌ای</span>
+          </h1>
+          <p class="hidden sm:block text-xs text-slate-500 truncate">پخش زنده پایدار همزمان روبیکا، اینستاگرام و یوتیوب</p>
+        </div>
+      </div>
+
+      <!-- Engine, PWA Install & Live Indicators -->
+      <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+        <!-- PWA Install App Button -->
+        <button type="button" id="installPwaBtn" class="hidden btn-brand-primary px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] font-bold flex items-center gap-1.5 shadow-sm" title="نصب اپلیکیشن استودیو روی دستگاه">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          <span>نصب اپ</span>
+        </button>
+
+        <div id="ffmpegBadge" class="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white border border-brand-border text-slate-600 shadow-sm">
+          <span class="w-2 h-2 rounded-full bg-slate-400" id="ffmpegDot"></span>
+          <span id="ffmpegText">موتور پردازش...</span>
+        </div>
+
+        <div id="statusPill" class="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1 rounded-full text-[11px] sm:text-xs font-bold bg-white border border-brand-border text-slate-700 shadow-sm transition-all duration-300">
+          <span class="relative flex h-2 w-2 shrink-0">
+            <span id="statusPing" class="hidden absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75 animate-ping"></span>
+            <span id="statusDot" class="relative inline-flex rounded-full h-2 w-2 bg-slate-400"></span>
+          </span>
+          <span id="statusLabel">آماده</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Offline Network Alert Banner -->
+  <div id="offlineBanner" class="hidden bg-amber-50 border-b border-amber-200 text-amber-900 text-xs font-bold py-2 px-4 text-center">
+    ارتباط اینترنت دستگاه قطع شده است؛ به محض اتصال مجدد، وضعیت استودیو همگام‌سازی می‌شود.
+  </div>
+
+  <!-- Main Container -->
+  <main class="pwa-safe-main max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
+
+      <!-- ========================================================
+           BENTO CELL 1: Realistic Smartphone Live Monitor
+           Spans 5 Columns on Desktop (Sticky)
+           ======================================================== -->
+      <div data-mobile-section="monitor" class="lg:col-span-5 desktop-sticky-monitor bento-card p-3.5 sm:p-5 flex flex-col items-center justify-between space-y-3.5 sm:space-y-4">
+        
+        <!-- Cell Header -->
+        <div class="w-full flex items-center justify-between pb-3 border-b border-brand-border/60">
+          <div class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-brand-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+            <h2 class="text-xs font-bold text-brand-950">مانیتورینگ لایو در صفحه موبایل</h2>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <!-- Refresh Preview Button -->
+            <button type="button" id="forceReloadPreviewBtn" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-brand-900 text-[11px] font-bold border border-brand-border flex items-center gap-1 shadow-xs" title="تازه‌سازی پیش‌نمایش">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span>تازه‌سازی</span>
+            </button>
+
+            <!-- Toggle for In-Phone Preview -->
+            <label class="apple-toggle flex items-center gap-1.5">
+              <input type="checkbox" id="togglePreviewCheckbox" checked class="apple-toggle-input">
+              <span class="apple-toggle-track">
+                <span class="apple-toggle-thumb"></span>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Realistic Smartphone Mockup -->
+        <div class="phone-device">
+          <div class="phone-screen" id="phoneScreen">
+            
+            <!-- Dynamic Island -->
+            <div class="phone-island">
+              <div class="phone-camera-lens"></div>
+              <div class="phone-sensor-dot"></div>
+            </div>
+
+            <!-- iOS Top Status Bar -->
+            <div class="phone-status-bar">
+              <span class="phone-clock font-mono-code" id="phoneLiveClock">۱۲:۴۵</span>
+              <div class="phone-icons">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="2" y="16" width="3" height="6" rx="1"></rect>
+                  <rect x="7" y="12" width="3" height="10" rx="1"></rect>
+                  <rect x="12" y="8" width="3" height="14" rx="1"></rect>
+                  <rect x="17" y="4" width="3" height="18" rx="1"></rect>
+                </svg>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.393 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>
+                </svg>
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="2" y="7" width="17" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect>
+                  <rect x="4" y="9" width="11" height="6" rx="1"></rect>
+                  <path d="M21 10v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Viewport & Video Player -->
+            <div class="phone-viewport" id="playerWrapper">
+              
+              <!-- Video Element (HLS Stream from server) -->
+              <video id="previewVideo" playsinline muted controls class="phone-video"></video>
+
+              <!-- OFFLINE STATE -->
+              <div id="playerPlaceholder" class="phone-offline-layer">
+                
+                <div class="offline-radar-box">
+                  <span class="offline-radar-ring"></span>
+                  <span class="offline-radar-ring"></span>
+                  <div class="offline-radar-core">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 4.243a9 9 0 01-2.829-6.364M3 3l18 18" />
+                    </svg>
+                  </div>
+                </div>
+
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 mb-2">
+                  سیگنال ورودی قطع است
+                </span>
+
+                <h3 class="text-xs font-bold text-white mb-1" id="placeholderTitle">
+                  پخش زنده غیرفعال است
+                </h3>
+                
+                <p class="text-[11px] text-slate-400 max-w-[210px] leading-relaxed" id="placeholderDesc">
+                  برای پخش پیش‌نمایش در موبایل، آدرس ورودی را وارد کرده و دکمه شروع لایو را بزنید.
+                </p>
+
+                <div class="flex items-center gap-1.5 mt-4 opacity-50">
+                  <span class="w-1.5 h-1.5 rounded-full bg-slate-500 animate-pulse"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-slate-500 animate-pulse" style="animation-delay: 0.2s"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-slate-500 animate-pulse" style="animation-delay: 0.4s"></span>
+                </div>
+              </div>
+
+              <!-- Unmute Sound Floating Button -->
+              <button type="button" id="unmuteBtn" class="hidden absolute top-3 right-3 z-30 px-2.5 py-1 rounded-xl bg-brand-950/80 hover:bg-brand-950 text-white text-[11px] font-bold border border-white/20 flex items-center gap-1.5 shadow-lg backdrop-blur-md">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                </svg>
+                <span>فعال‌سازی صدا</span>
+              </button>
+
+            </div>
+
+            <!-- Home Bar -->
+            <div class="phone-home-indicator"></div>
+
+          </div>
+        </div>
+
+        <!-- Phone Spec Tag -->
+        <div class="w-full flex items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-brand-border/60">
+          <span>کادربندی: <b id="phoneAspectTag" class="text-brand-900 font-mono-code font-bold">عمودی ۹:۱۶</b></span>
+          <span class="text-brand-700 font-semibold">فید اختصاصی کم‌تاخیر</span>
+        </div>
+
+      </div>
+
+      <!-- ========================================================
+           RIGHT SECTION: 7 Columns Bento Grid of Controls & Telemetry
+           ======================================================== -->
+      <div class="lg:col-span-7 space-y-4 sm:space-y-5">
+        
+        <!-- Bento Cell 2: Top Telemetry Stats (4 Micro Cards in Bento) -->
+        <div data-mobile-section="monitor" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
+          
+          <!-- Stat 1: Uptime -->
+          <div class="bento-card p-3 sm:p-3.5 flex items-center gap-2 sm:gap-2.5">
+            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <span class="text-[10px] text-slate-400 block font-medium truncate">مدت زمان پخش</span>
+              <span id="statUptime" class="text-xs sm:text-sm font-black font-mono-code text-brand-950">00:00:00</span>
+            </div>
+          </div>
+
+          <!-- Stat 2: FPS -->
+          <div class="bento-card p-3 sm:p-3.5 flex items-center gap-2 sm:gap-2.5">
+            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-brand-50 text-brand-700 border border-brand-200 flex items-center justify-center shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <span class="text-[10px] text-slate-400 block font-medium truncate">نرخ فریم</span>
+              <span id="statFps" class="text-xs sm:text-sm font-black font-mono-code text-brand-950">0 FPS</span>
+            </div>
+          </div>
+
+          <!-- Stat 3: Bitrate -->
+          <div class="bento-card p-3 sm:p-3.5 flex items-center gap-2 sm:gap-2.5">
+            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 text-blue-600 border border-blue-200 flex items-center justify-center shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <span class="text-[10px] text-slate-400 block font-medium truncate">نرخ بیت</span>
+              <span id="statBitrate" class="text-xs sm:text-sm font-black font-mono-code text-brand-950">0 kbps</span>
+            </div>
+          </div>
+
+          <!-- Stat 4: Dropped Frames -->
+          <div class="bento-card p-3 sm:p-3.5 flex items-center gap-2 sm:gap-2.5">
+            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <span class="text-[10px] text-slate-400 block font-medium truncate">افت فریم</span>
+              <span id="statDrop" class="text-xs sm:text-sm font-black font-mono-code text-brand-950">0</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Custom Scene Studio (تعریف و مدیریت سکانس‌ها توسط کاربر) -->
+        <div data-mobile-section="channels" class="bento-card p-3.5 sm:p-4 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-brand-border/60 pb-2.5">
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-brand-900 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+              </svg>
+              <h2 class="text-xs font-bold text-brand-950">مدیریت و تعریف سکانس‌ها</h2>
+            </div>
+
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+              <input type="text" id="newSceneNameInput" placeholder="نام سکانس جدید..." class="bento-input px-2.5 py-1.5 text-xs flex-1 sm:flex-initial sm:w-36">
+              <button type="button" id="addNewSceneBtn" class="btn-brand-emerald px-3 py-1.5 text-xs font-bold rounded-xl flex items-center gap-1 shrink-0 min-h-[38px] sm:min-h-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                <span>ایجاد سکانس</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dynamic Scenes List -->
+          <div id="scenesContainer" class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Bento Cell 3: Platform Presets & Profile Manager -->
+        <div data-mobile-section="channels" class="bento-card p-3.5 sm:p-4 space-y-3">
+          <div class="flex items-center justify-between border-b border-brand-border/60 pb-2">
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-brand-900 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+              <h2 class="text-xs font-bold text-brand-950">پروفایل پلتفرم‌ها (روبیکا، اینستاگرام، یوتیوب)</h2>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2">
+            <div class="flex items-center gap-2 flex-1 min-w-0">
+              <select id="profileSelect" class="bento-input flex-1 min-w-0 px-3 py-1.5 text-xs font-semibold focus:outline-none">
+                <!-- Populated by JS -->
+              </select>
+
+              <button type="button" id="loadProfileBtn" class="btn-brand-primary px-3.5 py-1.5 text-xs font-bold rounded-xl shrink-0 min-h-[38px] sm:min-h-0">
+                اعمال پروفایل
+              </button>
+            </div>
+
+            <div class="flex items-center gap-1.5 sm:border-r sm:border-brand-border sm:pr-2 w-full sm:w-auto">
+              <input type="text" id="profileNameInput" placeholder="نام پروفایل..." class="bento-input px-2.5 py-1.5 text-xs flex-1 sm:flex-initial sm:w-28">
+              <button type="button" id="saveProfileBtn" class="btn-brand-emerald px-3 py-1.5 text-xs font-bold rounded-xl shrink-0 min-h-[38px] sm:min-h-0">
+                ذخیره
+              </button>
+              <button type="button" id="deleteProfileBtn" class="btn-brand-rose px-2.5 py-1.5 text-xs font-bold rounded-xl shrink-0 min-h-[38px] sm:min-h-0" title="حذف پروفایل">
+                حذف
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bento Cell 4: SRT Input Source -->
+        <div data-mobile-section="channels" class="bento-card p-3.5 sm:p-4 space-y-2.5">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-brand-border/60 pb-2">
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-brand-900 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+              </svg>
+              <h2 class="text-xs font-bold text-brand-950">آدرس فید ورودی SRT</h2>
+            </div>
+            <span class="text-[10px] text-brand-900 font-bold bg-brand-50 border border-brand-200 px-2 py-0.5 rounded-full">
+              بافر هوشمند ۶۴ مگابایت
+            </span>
+          </div>
+
+          <input 
+            type="text" 
+            id="srtUrl" 
+            dir="ltr" 
+            placeholder="srt://127.0.0.1:9000?mode=caller&latency=2000000"
+            class="w-full bento-input px-3.5 py-2 text-xs font-mono-code text-left"
+            required
+          />
+        </div>
+
+        <!-- Bento Cell 5: Multi-Destination Broadcasting with Real-time Status Badges -->
+        <div data-mobile-section="channels" class="bento-card p-3.5 sm:p-4 space-y-3">
+          <div class="flex items-center justify-between border-b border-brand-border/60 pb-2">
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-brand-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+              </svg>
+              <h2 class="text-xs font-bold text-brand-950">کانال‌های ارسال همزمان لایو</h2>
+            </div>
+            <span class="text-[10px] text-emerald-800 font-bold bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+              ارسال مستقیم و پایدار
+            </span>
+          </div>
+
+          <!-- Channel 1: Rubika -->
+          <div class="p-3 rounded-2xl border border-brand-border/70 bg-white/70 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <label class="apple-toggle flex items-center gap-2.5">
+                <input type="checkbox" id="destRubikaEnable" checked class="apple-toggle-input">
+                <span class="apple-toggle-track">
+                  <span class="apple-toggle-thumb"></span>
+                </span>
+                <span class="text-xs font-bold text-brand-950">پخش زنده روبیکا</span>
+              </label>
+
+              <!-- Real-time Live Connection Status Badge -->
+              <span id="destRubikaStatusBadge" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                <span>غیرفعال</span>
+              </span>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <input type="text" id="destRubikaUrl" dir="ltr" value="rtmp://live.rubika.ir/live" placeholder="rtmp://live.rubika.ir/live یا IP اختصاصی" class="w-full bento-input px-3 py-1.5 text-xs font-mono-code text-left">
+              <div class="relative flex items-center">
+                <input type="password" id="destRubikaKey" dir="ltr" placeholder="کلید پخش روبیکا" class="w-full bento-input pl-8 pr-3 py-1.5 text-xs font-mono-code text-left">
+                <button type="button" class="toggle-pwd-btn absolute left-2 text-slate-400 hover:text-slate-600 focus:outline-none" data-target="destRubikaKey" title="نمایش کلید">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 eye-open" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 eye-closed hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-brand-border/40">
+              <span class="font-medium">کادر روبیکا: <b class="text-brand-900 font-bold">تمام‌کادر عمودی بدون برش (۷۲۰×۱۲۸۰)</b></span>
+              <span class="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-bold border border-emerald-200">کامل و بدون حاشیه</span>
+            </div>
+          </div>
+
+          <!-- Channel 2: Instagram (Isolated with Custom Anti-Crop Blur Margin) -->
+          <div class="p-3 rounded-2xl border border-brand-border/70 bg-white/70 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <label class="apple-toggle flex items-center gap-2.5">
+                <input type="checkbox" id="destInstaEnable" class="apple-toggle-input">
+                <span class="apple-toggle-track">
+                  <span class="apple-toggle-thumb"></span>
+                </span>
+                <span class="text-xs font-bold text-brand-950">پخش زنده اینستاگرام</span>
+              </label>
+
+              <!-- Real-time Live Connection Status Badge -->
+              <span id="destInstaStatusBadge" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                <span>غیرفعال</span>
+              </span>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <input type="text" id="destInstaUrl" dir="ltr" value="rtmps://live-upload.instagram.com:443/rtmp/" placeholder="آدرس سرور اینستاگرام" class="w-full bento-input px-3 py-1.5 text-xs font-mono-code text-left">
+              <div class="relative flex items-center">
+                <input type="password" id="destInstaKey" dir="ltr" placeholder="کلید پخش اینستاگرام" class="w-full bento-input pl-8 pr-3 py-1.5 text-xs font-mono-code text-left">
+                <button type="button" class="toggle-pwd-btn absolute left-2 text-slate-400 hover:text-slate-600 focus:outline-none" data-target="destInstaKey" title="نمایش کلید">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 eye-open" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 eye-closed hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Instagram Anti-Crop Safe Zone with Customizable Margin % -->
+            <div class="space-y-2 pt-1 border-t border-brand-border/40">
+              <div class="flex items-center justify-between text-[11px]">
+                <div class="space-y-0.5">
+                  <span class="font-bold text-brand-900 block">حاشیه امن ضد برش با تاری زنده پس‌زمینه:</span>
+                  <span class="text-[10px] text-slate-500 block">فقط برای اینستاگرام بدون کوچک‌ترین اثر روی روبیکا</span>
+                </div>
+                <label class="apple-toggle flex items-center gap-1.5 shrink-0">
+                  <input type="checkbox" id="destInstaAntiCrop" checked class="apple-toggle-input">
+                  <span class="apple-toggle-track">
+                    <span class="apple-toggle-thumb"></span>
+                  </span>
+                </label>
+              </div>
+
+              <!-- Margin % Slider -->
+              <div id="instaMarginControlBox" class="flex items-center gap-3 p-2 rounded-xl bg-slate-50 border border-brand-border/60">
+                <span class="text-[11px] font-medium text-slate-600 shrink-0">درصد حاشیه امن:</span>
+                <input type="range" id="destInstaAntiCropMargin" min="5" max="35" value="15" class="w-full accent-brand-900 h-1.5 bg-slate-200 rounded-lg cursor-pointer">
+                <span id="destInstaAntiCropMarginVal" class="text-xs font-mono-code font-bold text-brand-900 shrink-0 w-10 text-left">15%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Channel 3: YouTube -->
+          <div class="p-3 rounded-2xl border border-brand-border/70 bg-white/70 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <label class="apple-toggle flex items-center gap-2.5">
+                <input type="checkbox" id="destYouTubeEnable" class="apple-toggle-input">
+                <span class="apple-toggle-track">
+                  <span class="apple-toggle-thumb"></span>
+                </span>
+                <span class="text-xs font-bold text-brand-950">پخش زنده یوتیوب</span>
+              </label>
+
+              <!-- Real-time Live Connection Status Badge -->
+              <span id="destYouTubeStatusBadge" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                <span>غیرفعال</span>
+              </span>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <input type="text" id="destYouTubeUrl" dir="ltr" value="rtmp://a.rtmp.youtube.com/live2" placeholder="rtmp://a.rtmp.youtube.com/live2" class="w-full bento-input px-3 py-1.5 text-xs font-mono-code text-left">
+              <div class="relative flex items-center">
+                <input type="password" id="destYouTubeKey" dir="ltr" placeholder="کلید پخش یوتیوب" class="w-full bento-input pl-8 pr-3 py-1.5 text-xs font-mono-code text-left">
+                <button type="button" class="toggle-pwd-btn absolute left-2 text-slate-400 hover:text-slate-600 focus:outline-none" data-target="destYouTubeKey" title="نمایش کلید">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 eye-open" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 eye-closed hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- YouTube Custom Settings -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 border-t border-brand-border/40">
+              <div>
+                <label for="destYouTubeAspect" class="block text-[10px] text-slate-500 mb-0.5">کادربندی یوتیوب</label>
+                <select id="destYouTubeAspect" class="w-full bento-input px-2 py-1 text-[11px] font-semibold text-brand-900">
+                  <option value="horizontal" selected>افقی استودیویی (۱۶:۹)</option>
+                  <option value="vertical">عمودی شورتز (۹:۱۶)</option>
+                </select>
+              </div>
+              <div>
+                <label for="destYouTubeFitMode" class="block text-[10px] text-slate-500 mb-0.5">سبک نمایش افقی</label>
+                <select id="destYouTubeFitMode" class="w-full bento-input px-2 py-1 text-[11px] font-semibold text-brand-900">
+                  <option value="blur" selected>تاری هوشمند کناره‌ها</option>
+                  <option value="fit">حفظ نسبت تصویر با حاشیه مشکی</option>
+                  <option value="crop">برش هوشمند تمام‌صفحه</option>
+                </select>
+              </div>
+              <div>
+                <label for="destYouTubeBitrate" class="block text-[10px] text-slate-500 mb-0.5">نرخ بیت یوتیوب</label>
+                <input type="number" id="destYouTubeBitrate" value="3500" step="100" class="w-full bento-input px-2 py-1 text-[11px] font-mono-code text-center">
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ========================================================
+         ROW 2: Encoding Settings, Multi-Image Layer Studio & On-Demand Record
+         ======================================================== -->
+    <div data-mobile-section="studio" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 mt-4 sm:mt-5">
+      
+      <!-- Bento Cell 6: Video Encoding & Transform -->
+      <div class="bento-card p-3.5 sm:p-4 space-y-3">
+        <div class="flex items-center justify-between border-b border-brand-border/60 pb-2">
+          <div class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-brand-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <h2 class="text-xs font-bold text-brand-950">کیفیت و کادر تصویر</h2>
+          </div>
+
+          <label class="apple-toggle flex items-center gap-1.5" title="عبور مستقیم بدون تبدیل">
+            <span class="text-[11px] font-bold text-amber-800">حالت مستقیم</span>
+            <input type="checkbox" id="passthroughCheckbox" class="apple-toggle-input">
+            <span class="apple-toggle-track">
+              <span class="apple-toggle-thumb"></span>
+            </span>
+          </label>
+        </div>
+
+        <div id="filterControlsGroup" class="space-y-3">
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label for="videoWidth" class="block text-[11px] font-medium text-slate-500 mb-1">عرض تصویر</label>
+              <input type="number" id="videoWidth" value="720" step="2" class="w-full bento-input px-2.5 py-1.5 text-xs font-mono-code text-center">
+            </div>
+            <div>
+              <label for="videoHeight" class="block text-[11px] font-medium text-slate-500 mb-1">ارتفاع تصویر</label>
+              <input type="number" id="videoHeight" value="1280" step="2" class="w-full bento-input px-2.5 py-1.5 text-xs font-mono-code text-center">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label for="videoBitrate" class="block text-[11px] font-medium text-slate-500 mb-1">نرخ بیت (کیلوبیت)</label>
+              <input type="number" id="videoBitrate" value="2500" step="100" class="w-full bento-input px-2.5 py-1.5 text-xs font-mono-code text-center">
+            </div>
+            <div>
+              <label for="targetFps" class="block text-[11px] font-medium text-slate-500 mb-1">نرخ فریم</label>
+              <select id="targetFps" class="w-full bento-input px-2 py-1.5 text-xs text-center">
+                <option value="25">25 فریم</option>
+                <option value="30" selected>30 فریم</option>
+                <option value="60">60 فریم</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label for="videoRotation" class="block text-[11px] font-medium text-slate-500 mb-1">چرخش تصویر</label>
+              <select id="videoRotation" class="w-full bento-input px-2 py-1.5 text-xs">
+                <option value="0">بدون چرخش (۰°)</option>
+                <option value="90">۹۰° ساعتگرد</option>
+                <option value="270">۹۰° پادساعتگرد</option>
+                <option value="180">۱۸۰° وارونه</option>
+              </select>
+            </div>
+            <div>
+              <label for="scalingMode" class="block text-[11px] font-medium text-slate-500 mb-1">نحوه برش تصویر</label>
+              <select id="scalingMode" class="w-full bento-input px-2 py-1.5 text-xs">
+                <option value="crop">برش هوشمند تمام‌صفحه</option>
+                <option value="fit">اندازه متناسب با حاشیه</option>
+                <option value="stretch">کشش کامل تصویر</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bento Cell 7: Multi-Image Overlay & Graphics Studio (امکان افزودن چند عکس روی لایو) -->
+      <div class="bento-card p-4 space-y-3">
+        <div class="flex items-center justify-between border-b border-brand-border/60 pb-2">
+          <div class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-brand-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <h2 class="text-xs font-bold text-brand-950">لایه‌های تصویری و نشان‌ها</h2>
+          </div>
+
+          <!-- Add New Layer Button -->
+          <button type="button" id="addNewOverlayBtn" class="btn-brand-emerald px-2.5 py-1 text-xs font-bold rounded-xl flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>افزودن تصویر</span>
+          </button>
+        </div>
+
+        <!-- Overlays Layer List -->
+        <div id="overlaysContainer" class="space-y-3 max-h-80 overflow-y-auto pr-1">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Bento Cell 8: On-Demand Instant Record & Archive -->
+      <div class="bento-card p-4 space-y-3">
+        <div class="flex items-center justify-between border-b border-brand-border/60 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
+            <h2 class="text-xs font-bold text-brand-950">ضبط به درخواست و آرشیو</h2>
+          </div>
+          <span id="manualRecordBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+            آماده
+          </span>
+        </div>
+
+        <!-- On-Demand Record Control Box -->
+        <div class="p-3 rounded-2xl bg-white border border-brand-border space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div>
+              <span class="text-[10px] text-slate-400 block font-medium">مدت ضبط جاری:</span>
+              <span id="manualRecordTimer" class="font-mono-code font-bold text-sm text-brand-950">00:00:00</span>
+            </div>
+
+            <button 
+              type="button" 
+              id="instantRecordBtn" 
+              class="btn-brand-primary px-3.5 py-2 text-xs font-bold rounded-xl flex items-center gap-1.5"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-rose-300" viewBox="0 0 20 20" fill="currentColor">
+                <circle cx="10" cy="10" r="7" />
+              </svg>
+              <span id="instantRecordBtnText">شروع ضبط</span>
+            </button>
+          </div>
+
+          <!-- Auto-record on start toggle (OFF by default) -->
+          <div class="flex items-center justify-between text-[11px] pt-1.5 border-t border-brand-border/40 text-slate-600">
+            <span>ضبط خودکار همزمان با شروع لایو:</span>
+            <label class="apple-toggle flex items-center gap-1.5">
+              <input type="checkbox" id="autoRecordCheckbox" class="apple-toggle-input">
+              <span class="apple-toggle-track">
+                <span class="apple-toggle-thumb"></span>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Files List with In-Browser Play, Download and 72h auto cleanup -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between text-[11px] text-slate-500 px-0.5">
+            <span>آرشیو فایل‌ها (حذف خودکار پس از ۷۲ ساعت)</span>
+            <button type="button" id="refreshRecordingsBtn" class="text-brand-900 hover:text-brand-700 font-bold">تازه‌سازی</button>
+          </div>
+          <div id="recordingsList" class="space-y-1.5 max-h-36 overflow-y-auto pr-1 text-xs">
+            <span class="text-slate-400 block text-center py-2">در حال بارگذاری...</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ========================================================
+         ROW 3: Master Action Trigger Card (Start & Stop Stream)
+         ======================================================== -->
+    <div data-mobile-section="always" class="mt-4 sm:mt-5 bento-card p-3.5 sm:p-5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3.5 sm:gap-4">
+      
+      <div class="space-y-1">
+        <h3 class="text-xs font-bold text-brand-950 flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-brand-900"></span>
+          کنترل مرکزی پخش زنده
+        </h3>
+        <p id="detailedStatusText" class="text-xs font-semibold text-slate-600">
+          سیستم در حالت آماده‌باش قرار دارد.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap sm:flex-nowrap items-center gap-2.5 sm:gap-3 w-full md:w-auto">
+        <!-- Optional Manual Restart Button (Only shown when live and user wants deliberate refresh) -->
+        <button 
+          type="button" 
+          id="restartLiveBtn" 
+          class="hidden w-full sm:w-auto py-3 sm:py-3.5 px-4 sm:px-5 rounded-2xl font-bold text-xs bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 flex items-center justify-center gap-1.5 shadow-sm transition-all min-h-[46px]"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <span>بازنشانی استریم</span>
+        </button>
+
+        <button 
+          type="button" 
+          id="startBtn" 
+          class="flex-1 md:flex-initial py-3 sm:py-3.5 px-5 sm:px-8 rounded-2xl font-black text-xs sm:text-sm btn-brand-emerald flex items-center justify-center gap-2 disabled:opacity-40 disabled:pointer-events-none sm:min-w-[170px] min-h-[48px]"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span id="startBtnText">شروع ارسال لایو</span>
+        </button>
+
+        <button 
+          type="button" 
+          id="stopBtn" 
+          disabled 
+          class="flex-1 md:flex-initial py-3 sm:py-3.5 px-5 sm:px-8 rounded-2xl font-black text-xs sm:text-sm btn-brand-rose flex items-center justify-center gap-2 disabled:opacity-30 disabled:pointer-events-none sm:min-w-[150px] min-h-[48px]"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+          </svg>
+          <span>توقف استریم</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ========================================================
+         ROW 4: Live Monospace Terminal Cell
+         ======================================================== -->
+    <div data-mobile-section="logs" class="mt-4 sm:mt-5 rounded-2xl overflow-hidden shadow-lg border border-slate-800">
+      
+      <!-- Terminal Header -->
+      <div class="bg-brand-950 px-3.5 sm:px-4 py-2.5 flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 text-white border-b border-slate-800">
+        <div class="flex items-center gap-2">
+          <div class="hidden sm:flex items-center gap-1.5 pl-1" dir="ltr">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+          </div>
+          <span class="text-xs font-bold flex items-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-brand-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            لاگ‌های زنده سرور و انکودر
+          </span>
+          <span id="logCountBadge" class="text-[10px] font-mono-code px-2 py-0.5 rounded-full bg-slate-900 text-slate-400">
+            0 خط
+          </span>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <label class="apple-toggle flex items-center gap-1.5 text-[11px] sm:text-xs text-slate-300 select-none">
+            <span>اسکرول خودکار</span>
+            <input type="checkbox" id="autoScrollCheckbox" checked class="apple-toggle-input">
+            <span class="apple-toggle-track">
+              <span class="apple-toggle-thumb"></span>
+            </span>
+          </label>
+
+          <button 
+            type="button" 
+            id="copyLogsBtn" 
+            class="px-2.5 py-1 text-[11px] sm:text-xs rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 flex items-center gap-1"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+            <span id="copyLogsText">کپی لاگ</span>
+          </button>
+
+          <button 
+            type="button" 
+            id="clearLogsBtn" 
+            class="px-2.5 py-1 text-[11px] sm:text-xs rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 flex items-center gap-1"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            <span>پاکسازی</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Terminal Body -->
+      <div 
+        id="terminalBox" 
+        dir="ltr" 
+        class="terminal-scroll p-3 sm:p-3.5 h-56 sm:h-64 overflow-y-auto font-mono-code text-[11px] sm:text-xs bg-slate-950 text-slate-200 whitespace-pre-wrap select-text leading-relaxed"
+      >
+[سیستم] استودیو آماده دریافت فید ورودی SRT است.
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ========================================================
+       MOBILE NATIVE PWA BOTTOM NAVIGATION BAR (< 768px)
+       ======================================================== -->
+  <nav id="mobileBottomNav" class="md:hidden mobile-bottom-nav" aria-label="ناوبری موبایل">
+    <div class="grid grid-cols-5 gap-1 max-w-md mx-auto">
+      <button type="button" class="mobile-nav-btn is-active" data-nav-tab="all">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+        </svg>
+        <span>همه</span>
+      </button>
+
+      <button type="button" class="mobile-nav-btn" data-nav-tab="monitor">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+        </svg>
+        <span>مانیتور</span>
+      </button>
+
+      <button type="button" class="mobile-nav-btn" data-nav-tab="channels">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+        </svg>
+        <span>کانال‌ها</span>
+      </button>
+
+      <button type="button" class="mobile-nav-btn" data-nav-tab="studio">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+        </svg>
+        <span>استودیو</span>
+      </button>
+
+      <button type="button" class="mobile-nav-btn" data-nav-tab="logs">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <span>لاگ</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ========================================================
+       MODAL: In-Browser Video Player for Recordings
+       ======================================================== -->
+  <div id="recordingModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-sm hidden transition-opacity">
+    <div class="bg-white rounded-3xl border border-brand-border shadow-2xl max-w-2xl w-full max-h-[90dvh] overflow-y-auto p-4 sm:p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-brand-border/60 pb-3 gap-2">
+        <div class="flex items-center gap-2 min-w-0">
+          <div class="w-8 h-8 rounded-xl bg-brand-50 text-brand-900 border border-brand-200 flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="min-w-0">
+            <h3 class="text-xs font-bold text-brand-950 truncate" id="modalVideoTitle">پخش ویدیو ضبط‌شده</h3>
+            <span class="text-[10px] text-slate-400 font-mono-code" id="modalVideoSubtitle"></span>
+          </div>
+        </div>
+
+        <button type="button" id="closeModalBtn" class="text-slate-400 hover:text-slate-700 text-xl leading-none p-1.5 rounded-lg shrink-0">
+          &times;
+        </button>
+      </div>
+
+      <!-- Video Player -->
+      <div class="rounded-2xl overflow-hidden bg-black aspect-video flex items-center justify-center">
+        <video id="modalVideoPlayer" controls playsinline class="w-full h-full max-h-[55dvh] object-contain"></video>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex flex-wrap items-center justify-between gap-2 pt-2">
+        <a id="modalDownloadBtn" href="" download class="btn-brand-primary px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          <span>دانلود فایل اصلی</span>
+        </a>
+
+        <button type="button" id="modalCloseActionBtn" class="btn-brand-rose px-4 py-2.5 rounded-xl text-xs font-bold text-white">
+          بستن پنجره
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="fixed bottom-20 md:bottom-5 left-3 right-3 md:right-auto md:left-5 z-50 flex flex-col gap-2 md:max-w-sm pointer-events-none"></div>
+
+  <!-- JavaScript -->
+  <script src="app.js"></script>
+</body>
+</html>

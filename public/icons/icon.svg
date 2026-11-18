@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e4566"/>
+      <stop offset="55%" stop-color="#153047"/>
+      <stop offset="100%" stop-color="#0d1e2e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <rect x="20" y="20" width="472" height="472" rx="96" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="4"/>
+  <!-- Broadcast Signal Arcs -->
+  <path d="M148 164 A 145 145 0 0 1 364 164" fill="none" stroke="#9bc2db" stroke-width="18" stroke-linecap="round" opacity="0.45"/>
+  <path d="M184 202 A 95 95 0 0 1 328 202" fill="none" stroke="#9bc2db" stroke-width="18" stroke-linecap="round" opacity="0.8"/>
+  <!-- Camera Body -->
+  <rect x="116" y="226" width="206" height="148" rx="34" fill="#ffffff"/>
+  <!-- Camera Lens Triangle -->
+  <path d="M332 272 L396 234 C406 228 418 235 418 247 L418 353 C418 365 406 372 396 366 L332 328 Z" fill="#ffffff"/>
+  <!-- Live Dot -->
+  <circle cx="174" cy="282" r="24" fill="url(#accent)"/>
+</svg>
