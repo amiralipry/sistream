@@ -598,7 +598,7 @@ input[type="range"]::-moz-range-thumb {
 @media (min-width: 1024px) {
   .desktop-sticky-monitor {
     position: sticky;
-    top: 5.25rem;
+    top: 3.75rem;
   }
 }
 
