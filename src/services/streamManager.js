@@ -342,8 +342,8 @@ function startFFmpegProcess(config) {
         }
 
         const alphaVal = Math.max(0.1, Math.min(1.0, (parseInt(ov.opacity, 10) || 100) / 100)).toFixed(2);
-        const mX = Math.max(0, Math.min(400, parseInt(ov.marginX, 10) || 25));
-        const mY = Math.max(0, Math.min(400, parseInt(ov.marginY, 10) || 25));
+        const mX = Math.max(0, Math.min(safeWidth, parseInt(ov.marginX, 10) || 25));
+        const mY = Math.max(0, Math.min(safeHeight, parseInt(ov.marginY, 10) || 25));
 
         let posExpr = `W-w-${mX}:${mY}`;
         if (ov.position === 'top_left') posExpr = `${mX}:${mY}`;
@@ -351,6 +351,11 @@ function startFFmpegProcess(config) {
         else if (ov.position === 'bottom_left') posExpr = `${mX}:H-h-${mY}`;
         else if (ov.position === 'center') posExpr = `(W-w)/2:(H-h)/2`;
         else if (ov.position === 'full_frame') posExpr = `0:0`;
+        else if (ov.position === 'custom') {
+          const xRatio = (Math.max(0, Math.min(100, parseFloat(ov.xPct ?? 50))) / 100).toFixed(4);
+          const yRatio = (Math.max(0, Math.min(100, parseFloat(ov.yPct ?? 50))) / 100).toFixed(4);
+          posExpr = `W*${xRatio}-w/2:H*${yRatio}-h/2`;
+        }
 
         const scalePct = Math.max(5, Math.min(100, parseInt(ov.scale, 10) || 20));
         let targetW = Math.round(safeWidth * (scalePct / 100));

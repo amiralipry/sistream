@@ -1,5 +1,5 @@
 // Live Studio PWA Service Worker
-const CACHE_NAME = 'live-studio-shell-v3';
+const CACHE_NAME = 'live-studio-shell-v4';
 const APP_SHELL_ASSETS = [
   '/',
   '/index.html',
@@ -8,6 +8,7 @@ const APP_SHELL_ASSETS = [
   '/js/ui.js',
   '/js/preview.js',
   '/js/studio.js',
+  '/js/sceneEditor.js',
   '/manifest.json',
   '/icons/icon.svg',
   '/icons/icon-192.png',

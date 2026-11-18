@@ -1,6 +1,12 @@
 // Studio Configuration: Per-Platform Profiles & Popup Settings, Multi-Image Overlays & Custom Scenes
 import { showToast, showConfirmModal, escapeHtml } from './ui.js';
 import { updatePlayerAspectRatio } from './preview.js';
+import {
+  openSceneEditor,
+  initSceneEditorModal,
+  normalizeScene,
+  buildSceneOverlaysPayload
+} from './sceneEditor.js';
 
 // Core Inputs
 const srtUrlInput = document.getElementById('srtUrl');
@@ -819,9 +825,13 @@ function attachOverlayEventListeners() {
   bindRange('.overlay-opacity-slider', 'opacity', '%');
 }
 
-// ====================== Custom Scenes ======================
+// ====================== Custom Scenes & Visual Editor Integration ======================
 function saveScenesToStorage() {
   localStorage.setItem(SCENES_STORAGE_KEY, JSON.stringify(scenesList));
+}
+
+function getActiveSceneObject() {
+  return scenesList.find((s) => s.id === currentSceneName || s.name === currentSceneName) || scenesList[0] || null;
 }
 
 function loadScenesFromStorage() {
@@ -829,32 +839,90 @@ function loadScenesFromStorage() {
     const raw = localStorage.getItem(SCENES_STORAGE_KEY);
     if (raw) {
       const stored = JSON.parse(raw);
-      if (Array.isArray(stored) && stored.length > 0) scenesList = stored;
+      if (Array.isArray(stored) && stored.length > 0) {
+        scenesList = stored.map(normalizeScene);
+      }
+    } else {
+      scenesList = scenesList.map((s) =>
+        normalizeScene({
+          ...s,
+          sourceMode: s.id === 'scene_standby' ? 'color' : 'live',
+          audioGain: s.id === 'scene_mute' || s.id === 'scene_standby' ? '0%' : '100%'
+        })
+      );
     }
-  } catch (_) {}
+  } catch (_) {
+    scenesList = scenesList.map(normalizeScene);
+  }
   renderScenesList();
+}
+
+function openEditorForScene(sceneId) {
+  const idx = scenesList.findIndex((s) => s.id === sceneId);
+  if (idx === -1) return;
+
+  openSceneEditor(scenesList[idx], (updatedScene) => {
+    scenesList[idx] = normalizeScene(updatedScene);
+    saveScenesToStorage();
+    renderScenesList();
+    if (currentSceneName === updatedScene.id) {
+      notifyConfigChange();
+    }
+  });
 }
 
 function renderScenesList() {
   if (!scenesContainer) return;
 
   scenesContainer.innerHTML = scenesList
-    .map((sc) => {
+    .map((raw) => {
+      const sc = normalizeScene(raw);
       const isActive = currentSceneName === sc.id || currentSceneName === sc.name;
+      const txtCount = sc.textLayers.filter((t) => t.enabled && (t.text || '').trim()).length;
+      const imgCount = sc.imageLayers.filter((i) => i.enabled && i.path).length;
+
+      const metaParts = [];
+      if (sc.sourceMode === 'color') metaParts.push('پرده رنگی');
+      else if (sc.sourceMode === 'image') metaParts.push('پس‌زمینه تصویر');
+      if (txtCount > 0) metaParts.push(`${txtCount} متن`);
+      if (imgCount > 0) metaParts.push(`${imgCount} عکس`);
+      if (sc.audioGain === '0%') metaParts.push('بی‌صدا');
+      const subtitle = metaParts.length > 0 ? metaParts.join(' • ') : sc.desc || 'فید مستقیم';
+
       return `
         <div
           class="scene-btn p-2.5 rounded-xl border-2 ${isActive ? 'border-brand-900 bg-brand-50 shadow-sm' : 'border-brand-border bg-white hover:bg-slate-50'} text-right flex flex-col justify-between transition-all relative group"
           data-scene-id="${sc.id}"
         >
           <div class="flex items-center justify-between gap-1">
-            <span class="text-xs font-bold truncate ${isActive ? 'text-brand-950 font-black' : 'text-slate-800'}">${escapeHtml(sc.name)}</span>
-            ${
-              !sc.isDefault
-                ? `<button type="button" class="text-slate-400 hover:text-rose-600 text-sm delete-scene-btn px-1 shrink-0" data-scene-id="${sc.id}" title="حذف این سکانس">&times;</button>`
-                : ''
-            }
+            <div class="flex items-center gap-1.5 min-w-0">
+              <span class="w-1.5 h-1.5 rounded-full shrink-0 ${isActive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}"></span>
+              <span class="text-xs font-bold truncate ${isActive ? 'text-brand-950 font-black' : 'text-slate-800'}">${escapeHtml(sc.name)}</span>
+            </div>
+
+            <div class="flex items-center gap-0.5 shrink-0">
+              <button
+                type="button"
+                class="edit-scene-btn p-1 rounded-lg text-brand-700 hover:bg-brand-100 hover:text-brand-950 transition-colors"
+                data-scene-id="${sc.id}"
+                title="ویرایش بصری سکانس (متن، عکس، پس‌زمینه)"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </button>
+              ${
+                !sc.isDefault
+                  ? `<button type="button" class="delete-scene-btn p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors" data-scene-id="${sc.id}" title="حذف سکانس">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>`
+                  : ''
+              }
+            </div>
           </div>
-          <span class="text-[10px] text-slate-500 mt-1 block truncate">${escapeHtml(sc.desc || '')}</span>
+          <span class="text-[10px] text-slate-500 mt-1 block truncate">${escapeHtml(subtitle)}</span>
         </div>
       `;
     })
@@ -866,9 +934,16 @@ function renderScenesList() {
 function attachSceneEventListeners() {
   if (!scenesContainer) return;
 
+  scenesContainer.querySelectorAll('.edit-scene-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openEditorForScene(btn.getAttribute('data-scene-id'));
+    });
+  });
+
   scenesContainer.querySelectorAll('.scene-btn').forEach((btn) => {
     btn.addEventListener('click', async (e) => {
-      if (e.target.classList.contains('delete-scene-btn')) return;
+      if (e.target.closest('.delete-scene-btn') || e.target.closest('.edit-scene-btn')) return;
       const scId = btn.getAttribute('data-scene-id');
       const sc = scenesList.find((s) => s.id === scId);
       if (!sc) return;
@@ -898,17 +973,28 @@ function attachSceneEventListeners() {
   });
 
   scenesContainer.querySelectorAll('.delete-scene-btn').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', async (e) => {
       e.stopPropagation();
       const scId = btn.getAttribute('data-scene-id');
       const idx = scenesList.findIndex((s) => s.id === scId);
-      if (idx !== -1 && !scenesList[idx].isDefault) {
-        const deletedName = scenesList[idx].name;
-        scenesList.splice(idx, 1);
-        saveScenesToStorage();
-        renderScenesList();
-        showToast(`سکانس «${deletedName}» حذف شد.`, 'info');
-      }
+      if (idx === -1 || scenesList[idx].isDefault) return;
+
+      const deletedName = scenesList[idx].name;
+      const ok = await showConfirmModal({
+        title: 'حذف سکانس',
+        message: `آیا از حذف سکانس «${deletedName}» اطمینان دارید؟`,
+        confirmText: 'حذف سکانس',
+        cancelText: 'انصراف',
+        variant: 'danger'
+      });
+      if (!ok) return;
+
+      scenesList.splice(idx, 1);
+      if (currentSceneName === scId) currentSceneName = scenesList[0]?.id || 'scene_live';
+      saveScenesToStorage();
+      renderScenesList();
+      notifyConfigChange();
+      showToast(`سکانس «${deletedName}» حذف شد.`, 'info');
     });
   });
 }
@@ -918,6 +1004,7 @@ export function getCurrentFormConfig() {
   const r = platformState.rubika;
   const yt = platformState.youtube;
   const ig = platformState.instagram;
+  const activeScene = getActiveSceneObject();
 
   const destinations = [
     {
@@ -948,6 +1035,12 @@ export function getCurrentFormConfig() {
     }
   ];
 
+  // Combine Scene layers + Global overlay layers cleanly in proper Z-order
+  const sceneLayers = buildSceneOverlaysPayload(activeScene);
+  const bgLayers = sceneLayers.filter((l) => l.id.endsWith('_bg') || l.id.endsWith('_bgimg'));
+  const fgSceneLayers = sceneLayers.filter((l) => !l.id.endsWith('_bg') && !l.id.endsWith('_bgimg'));
+  const mergedOverlays = [...bgLayers, ...overlaysList, ...fgSceneLayers];
+
   return {
     srtUrl: srtUrlInput ? srtUrlInput.value.trim() : '',
     destinations,
@@ -965,7 +1058,9 @@ export function getCurrentFormConfig() {
     scalingMode: scalingModeSelect ? scalingModeSelect.value : 'crop',
     passthrough: passthroughCheckbox ? passthroughCheckbox.checked : false,
     autoRecordOnStart: autoRecordCheckbox ? autoRecordCheckbox.checked : false,
-    overlays: overlaysList,
+    audioGain: activeScene?.audioGain || '100%',
+    activeSceneId: activeScene?.id || 'scene_live',
+    overlays: mergedOverlays,
     autoReconnect: true
   };
 }
@@ -1038,6 +1133,11 @@ function hydrateSavedSettings() {
       });
     }
 
+    if (cfg.activeSceneId && scenesList.some((s) => s.id === cfg.activeSceneId)) {
+      currentSceneName = cfg.activeSceneId;
+      renderScenesList();
+    }
+
     if (destRubikaEnable) destRubikaEnable.checked = Boolean(platformState.rubika.enabled);
     if (destInstaEnable) destInstaEnable.checked = Boolean(platformState.instagram.enabled);
     if (destYouTubeEnable) destYouTubeEnable.checked = Boolean(platformState.youtube.enabled);
@@ -1051,6 +1151,7 @@ export function initStudioControls() {
   renderAllQuickProfileSelects();
   updatePlatformSummaries();
   initPlatformModalHandlers();
+  initSceneEditorModal();
 
   if (addNewOverlayBtn) {
     addNewOverlayBtn.addEventListener('click', () => {
@@ -1083,17 +1184,22 @@ export function initStudioControls() {
         return;
       }
 
-      scenesList.push({
+      const newScene = normalizeScene({
         id: `scene_${Date.now()}`,
         name,
-        desc: 'سکانس سفارشی ایجادشده توسط کاربر',
-        overlaysEnabled: overlaysList.some((o) => o.enabled),
+        desc: 'سکانس سفارشی',
+        sourceMode: 'live',
+        audioGain: '100%',
         isDefault: false
       });
+
+      scenesList.push(newScene);
+      currentSceneName = newScene.id;
       saveScenesToStorage();
       newSceneNameInput.value = '';
       renderScenesList();
-      showToast(`سکانس «${name}» با موفقیت ایجاد شد.`, 'success');
+      notifyConfigChange();
+      openEditorForScene(newScene.id);
     });
   }
 

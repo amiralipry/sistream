@@ -602,4 +602,43 @@ input[type="range"]::-moz-range-thumb {
   }
 }
 
+/* =================== Visual Scene Editor Studio =================== */
+.scene-editor-tab {
+  color: #475569;
+  background: transparent;
+}
+
+.scene-editor-tab.is-active {
+  background: linear-gradient(135deg, #1e4566 0%, #153047 100%);
+  color: #ffffff;
+  box-shadow: 0 6px 14px -4px rgba(21, 48, 71, 0.35);
+}
+
+.scene-stage-live-grid {
+  background-color: #0b1622;
+  background-image:
+    linear-gradient(rgba(155, 194, 219, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(155, 194, 219, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.stage-draggable-item {
+  position: absolute;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  transition: box-shadow 0.15s ease;
+}
+
+.stage-draggable-item:active {
+  cursor: grabbing;
+}
+
+.stage-draggable-item.is-selected {
+  outline: 2px dashed #10b981;
+  outline-offset: 4px;
+  border-radius: 10px;
+}
+
+
 
