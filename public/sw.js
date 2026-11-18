@@ -1,5 +1,5 @@
 // Live Studio PWA Service Worker
-const CACHE_NAME = 'live-studio-shell-v2';
+const CACHE_NAME = 'live-studio-shell-v3';
 const APP_SHELL_ASSETS = [
   '/',
   '/index.html',
